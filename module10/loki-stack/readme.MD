@@ -62,3 +62,8 @@ Then you will get grafana login password, the login username is 'admin' on defau
 ### Change the grafana service to NodePort type and access it
 
 Login password is in secret `loki-grafana`
+
+
+###Loki的语法官方地址V2.4.2
+
+https://grafana.com/docs/loki/latest/logql/
