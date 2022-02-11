@@ -21,3 +21,32 @@ pod dashboard
 Istio Mesh
 7639
 ```
+
+#prometheus的黑盒监控
+###比如检测下 gaoxin.kubeasy.com（使用任何一个公网域名或者公司内的域名探测即可）网站
+的状态，可以通过如下命令进行检查：
+```sh
+curl -s "http://192.168.204.117:19115/probe?target=gaoxin.kubeasy.com&module=http_2xx" | tail -1
+
+probe_tls_version_info{version="TLS 1.2"} 1
+
+probe 是接口地址，target 是检测的目标，module 是使用哪个模块进行探测。
+
+如果集群中没有配置 Blackbox Exporter，可以参考
+https://github.com/prometheus/blackbox_exporter 进行安装。
+```
+
+# 通过 Service Monitor 监控应用时，如果监控没有找到目标主机的排查步骤时，排查步骤如下：
+```sh
+➢ 确认 Service Monitor 是否成功创建
+
+➢ 确认 Service Monitor 标签是否配置正确
+
+➢ 确认 Prometheus 是否生成了相关配置
+
+➢ 确认存在 Service Monitor 匹配的 Service
+
+➢ 确认通过 Service 能够访问程序的 Metrics 接口
+
+➢ 确认 Service 的端口和 Scheme 和 Service Monitor 一致
+```
