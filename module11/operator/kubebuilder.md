@@ -134,7 +134,7 @@ func (r *XiaokeReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
  
-3，建webhook ，然后通过certmanager进行证书自动校验
+3，建webhook ，然后通过certmanager进行签发证书或者手动通过openssl签证书
 
 func (r *Xiaoke) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
@@ -165,5 +165,25 @@ func (r *Xiaoke) ValidateDelete() error {
 	return nil
 }
 
+
+```
+
+###webhook手动 openssl签证书
+
+```sh
+workdir=${1}
+keydir=$workdir/keys
+mkdir -p $keydir
+
+echo Generating the CA cert and private key to ${keydir}
+openssl req -nodes -new -x509 -keyout ${keydir}/ca.key -out ${keydir}/ca.crt -subj "/CN=crane"
+
+echo Generating the private key for the webhook server
+openssl genrsa -out ${keydir}/tls.key 2048
+
+# Generate a Certificate Signing Request (CSR) for the private key, and sign it with the private key of the CA.
+echo Signing the CSR, and generating cert into ${keydir}
+openssl req -new -key ${keydir}/tls.key -subj "/CN=webhook-service.crane-system.svc" -config ${workdir}/scripts/webhook.csr \
+    | openssl x509 -req -days 3650 -CA ${keydir}/ca.crt -CAkey ${keydir}/ca.key -CAcreateserial -out ${keydir}/tls.crt -extensions v3_req -extfile ${workdir}/scripts/webhook.csr
 
 ```
