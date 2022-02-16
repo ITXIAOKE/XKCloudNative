@@ -62,7 +62,7 @@ Build targets:
 ```
 
 ### Edit `controllers/mydaemonset_controller.go`, add permissions to the controller
-```go
+```sh
 //+kubebuilder:rbac:groups=apps.cncamp.io,resources=mydaemonsets/finalizers,verbs=update
 // Add the following
 //+kubebuilder:rbac:groups=core,resources=nodes,verbs=get;list;watch
@@ -96,6 +96,9 @@ kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.6
 
 ```sh
 kubebuilder create webhook --group apps --version v1beta1 --kind MyDaemonset --defaulting --programmatic-validation
+
+ kubebuilder create webhook --group xiaoke --version v1 --kind Xiaoke --defaulting --programmatic-validation
+
 ```
 
 ### Change code
@@ -103,3 +106,64 @@ kubebuilder create webhook --group apps --version v1beta1 --kind MyDaemonset --d
 ### Enable webhook in `config/default/kustomization.yaml`
 
 ### Redeploy
+
+### Operator 开发三大步骤
+```sh
+1，定义crd的struct
+
+type XiaokeSpec struct {
+	Image string `json:"image,omitempty"`
+}
+
+2，写controller 控制器
+
+//消费者
+func (r *XiaokeReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+	_ = log.FromContext(ctx)
+
+	// your logic here
+
+
+	return ctrl.Result{}, nil
+}
+
+//接收者
+func (r *XiaokeReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&xiaokev1.Xiaoke{}).
+		Complete(r)
+}
+ 
+3，建webhook ，然后通过certmanager进行证书自动校验
+
+func (r *Xiaoke) SetupWebhookWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewWebhookManagedBy(mgr).
+		For(r).
+		Complete()
+}
+
+var _ webhook.Defaulter = &Xiaoke{}
+
+func (r *Xiaoke) Default() {
+	xiaokelog.Info("default", "name", r.Name)
+}
+
+var _ webhook.Validator = &Xiaoke{}
+
+func (r *Xiaoke) ValidateCreate() error {
+	xiaokelog.Info("validate create", "name", r.Name)
+	return nil
+}
+
+func (r *Xiaoke) ValidateUpdate(old runtime.Object) error {
+	xiaokelog.Info("validate update", "name", r.Name)
+	return nil
+}
+
+func (r *Xiaoke) ValidateDelete() error {
+	xiaokelog.Info("validate delete", "name", r.Name)
+	return nil
+}
+
+
+```
