@@ -100,8 +100,8 @@ kubebuilder create webhook --group apps --version v1beta1 --kind MyDaemonset --d
  kubebuilder create webhook --group xiaoke --version v1 --kind Xiaoke --defaulting --programmatic-validation
 
 ```
+##使webhook生效改变代码地方如下：
 
-### Change code
 
 ### Enable webhook in `config/default/kustomization.yaml`
 

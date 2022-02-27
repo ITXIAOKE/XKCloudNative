@@ -14,15 +14,15 @@ spec:
         - destination:
             host: canary
             subset: v2
-      ### retry if upstream server send 5xx
+      ### retry if upstream server send 5xx  重试
       retries:
         attempts: 3
         perTryTimeout: 2s
     - route:
-      - destination:
-          host: canary
-          subset: v1
-      ### send 500 to client in 80%
+        - destination:
+            host: canary
+            subset: v1
+      ### send 500 to client in 80%  注入错误  混沌测试的时候用
       fault:
         abort:
           httpStatus: 500

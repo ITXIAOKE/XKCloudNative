@@ -11,7 +11,7 @@ spec:
       port:
         name: https-bookinfo
         number: 443
-        protocol: HTTPS
+        protocol: HTT PS
       tls:
         mode: SIMPLE
         credentialName: bookinfo-credential
